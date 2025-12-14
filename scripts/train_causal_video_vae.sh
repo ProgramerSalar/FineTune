@@ -10,7 +10,7 @@ VAE_MODEL_PATH=PATH/vae_ckpt   # The vae model dir
 LPIPS_CKPT=PATH/vgg_lpips.pth    # The LPIPS VGG CKPT path, used for calculating the lpips loss
 OUTPUT_DIR=/PATH/output_dir    # The checkpoint saving dir
 
-VIDEO_ANNO=annotation/video_dataset.jsonl   # The video annotation file path
+VIDEO_ANNO=annotation/sample_video_dataset.jsonl   # The video annotation file path
 RESOLUTION=256     # The training resolution, default is 256
 NUM_FRAMES=17     # x * 8 + 1, the number of video frames
 BATCH_SIZE=2
