@@ -1,18 +1,10 @@
-import os
-import json
-import torch
-import time
-import random
-from typing import Iterable
 
-from collections import OrderedDict
-from PIL import Image
-from torch.utils.data import Dataset, DataLoader, ConcatDataset, IterableDataset, DistributedSampler, RandomSampler
+import time
+
+from torch.utils.data import DataLoader, DistributedSampler
 from torch.utils.data.dataloader import default_collate
-from torchvision import transforms
-from torchvision.transforms.functional import InterpolationMode
-from torchvision.transforms import functional as F
-from .bucket_loader import Bucketeer, TemporalLengthBucketeer
+
+
 
 
 class IterLoader:
@@ -57,84 +49,7 @@ def identity(x):
     return x
 
 
-def create_image_text_dataloaders(dataset, batch_size, num_workers, 
-    multi_aspect_ratio=True, epoch=0, sizes=[(512, 512), (384, 640), (640, 384)],
-    use_distributed=True, world_size=None, rank=None,
-):
-    """
-        The dataset has already been splited by different rank
-    """
-    if use_distributed:
-        assert world_size is not None
-        assert rank is not None
-        sampler = DistributedSampler(
-            dataset,
-            shuffle=True,
-            num_replicas=world_size,
-            rank=rank,
-            seed=epoch,
-        )
-    else:
-        sampler = RandomSampler(dataset)
 
-    dataloader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        pin_memory=True,
-        sampler=sampler,
-        collate_fn=identity if multi_aspect_ratio else default_collate,
-        drop_last=True,
-    )
-
-    if multi_aspect_ratio:
-        dataloader_iterator = Bucketeer(
-            dataloader,
-            sizes=sizes,
-            is_infinite=True, epoch=epoch,
-        )
-    else:
-        dataloader_iterator = iter(dataloader)
-
-    # To make it infinite
-    loader = IterLoader(dataloader_iterator, use_distributed=False, epoch=epoch)
-
-    return loader
-
-
-def create_length_grouped_video_text_dataloader(dataset, batch_size, num_workers, max_frames, 
-    world_size=None, rank=None, epoch=0, use_distributed=False):
-    if use_distributed:
-        assert world_size is not None
-        assert rank is not None
-        sampler = DistributedSampler(
-            dataset,
-            shuffle=True,
-            num_replicas=world_size,
-            rank=rank,
-            seed=epoch,
-        )
-    else:
-        sampler = RandomSampler(dataset)
-
-    dataloader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        num_workers=num_workers,
-        pin_memory=True,
-        sampler=sampler,
-        collate_fn=identity,
-        drop_last=True,
-    )
-
-    # make it infinite
-    dataloader_iterator = TemporalLengthBucketeer(
-        dataloader,
-        max_frames=max_frames,
-        epoch=epoch,
-    )
-
-    return dataloader_iterator
 
 
 def create_mixed_dataloaders(

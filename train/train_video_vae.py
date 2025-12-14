@@ -13,7 +13,6 @@ from pathlib import Path
 from collections import OrderedDict
 
 from dataset import (
-    ImageDataset,
     VideoDataset,
     create_mixed_dataloaders,
 )
@@ -211,9 +210,7 @@ def main(args):
     if global_rank < video_gpus:
         training_dataset = VideoDataset(args.video_anno, resolution=args.resolution, 
             max_frames=args.max_frames, add_normalize=not args.not_add_normalize)
-    else:
-        training_dataset = ImageDataset(args.image_anno, resolution=args.resolution, 
-            max_frames=args.max_frames // 4, add_normalize=not args.not_add_normalize)
+    
 
     data_loader_train = create_mixed_dataloaders(
         training_dataset,
