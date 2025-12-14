@@ -14,7 +14,7 @@ ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
 
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 from torchvision.transforms.functional import InterpolationMode
 
@@ -128,3 +128,15 @@ class VideoDataset(Dataset):
             return self.__getitem__(random.randint(0, self.__len__() - 1))
 
 
+if __name__ == "__main__":
+
+    anno_file = "/home/manish/Desktop/projects/FineTune/FineTune/annotation/new_file.jsonl"
+    video_dataset = VideoDataset(anno_file)
+
+    # print(video_dataset)
+    video_dataloader = DataLoader(video_dataset, 
+                                  batch_size=2)
+    # print(video_dataloader)
+
+    for data in video_dataloader:
+        print(data['video'].shape)

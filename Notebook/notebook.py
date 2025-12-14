@@ -28,7 +28,7 @@ def convert_into_json(video_folder_path, video_json_file):
         print('not working...')
 
     with open(video_json_file, 'w', encoding='utf-8') as f:
-        json.dump(video_file_list, f, indent=2)
+        json.dump(video_file_list, f, indent=1)
     print("succesfuly dumps")
 
 
@@ -43,14 +43,37 @@ if __name__ == "__main__":
     # convert_into_json(video_folder_path, video_json_file)
     # ----------------------------------------------------------------------------------------
     # Testing video json 
-    # video_folder_path = "./Data"
+    # video_folder_path = "../Data"
     video_json_file = "./annotation/sample_video_dataset.jsonl"
     # convert_into_json(video_folder_path, video_json_file)
     # ------------------------------------------------------------------------------
-    with open(video_json_file, 'r') as f:
-        datas = json.load(f)
-        for data in datas:
-            print(data['video'])
+    # with open(video_json_file, 'r') as f:
+    #     datas = json.load(f)
+    #     for data in datas:
+    #         print(data['video'])
+
+    # --------------------------------------------------------------------------------------
+    import json
+
+    # 1. Setup paths
+    input_path = video_json_file # Replace this
+    output_path = "annotation/new_file.jsonl"    # This will be the fixed file
+
+    print(f"Reading {input_path}...")
+
+    # 2. Read the standard JSON array
+    with open(input_path, 'r', encoding='utf-8') as f:
+        data = json.load(f)
+
+    print(f"Found {len(data)} videos. Converting to JSONL...")
+
+    # 3. Write out to JSONL (one object per line)
+    with open(output_path, 'w', encoding='utf-8') as f:
+        for entry in data:
+            # Write the dictionary as a single line string
+            f.write(json.dumps(entry) + "\n")
+
+    print(f"Success! Use this file for training: {output_path}")
 
     
 

@@ -12,9 +12,11 @@ import random
 from pathlib import Path
 from collections import OrderedDict
 
+from torch.utils.data import Dataset, DataLoader
+
 from dataset import (
     VideoDataset,
-    create_mixed_dataloaders,
+    
 )
 
 from trainer_misc import (
@@ -212,16 +214,22 @@ def main(args):
             max_frames=args.max_frames, add_normalize=not args.not_add_normalize)
     
 
-    data_loader_train = create_mixed_dataloaders(
-        training_dataset,
-        batch_size=args.batch_size, 
-        num_workers=args.num_workers,
-        epoch=args.seed,
-        world_size=world_size,
-        rank=global_rank,
-        image_mix_ratio=args.image_mix_ratio,
-        use_image_video_mixed_training=args.use_image_video_mixed_training,
-    )
+    # data_loader_train = create_mixed_dataloaders(
+    #     training_dataset,
+    #     batch_size=args.batch_size, 
+    #     num_workers=args.num_workers,
+    #     epoch=args.seed,
+    #     world_size=world_size,
+    #     rank=global_rank,
+    #     image_mix_ratio=args.image_mix_ratio,
+    #     use_image_video_mixed_training=args.use_image_video_mixed_training,
+    # )
+
+    video_dataset = VideoDataset(args.anno_file)
+
+    # print(video_dataset)
+    data_loader_train = DataLoader(video_dataset, 
+                                  batch_size=args.batch_size)
     
     torch.distributed.barrier()
 
