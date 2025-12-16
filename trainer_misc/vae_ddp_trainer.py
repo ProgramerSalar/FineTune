@@ -87,7 +87,7 @@ def train_one_epoch(
             optimizer.zero_grad()
             is_second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
             grad_norm = loss_scaler(rec_loss, optimizer, clip_grad=clip_grad,
-                                    parameters=model.module.vae.parameters(), create_graph=is_second_order)
+                                    parameters=model.vae.parameters(), create_graph=is_second_order)
             
             if "scale" in loss_scaler.state_dict():
                 loss_scale_value = loss_scaler.state_dict()["scale"]
@@ -110,7 +110,7 @@ def train_one_epoch(
             optimizer_disc.zero_grad()
             is_second_order = hasattr(optimizer_disc, 'is_second_order') and optimizer_disc.is_second_order
             disc_grad_norm = loss_scaler_disc(gan_loss, optimizer_disc, clip_grad=clip_grad,
-                                    parameters=model.module.loss.discriminator.parameters(), create_graph=is_second_order)
+                                    parameters=model.loss.discriminator.parameters(), create_graph=is_second_order)
 
             if "scale" in loss_scaler_disc.state_dict():
                 disc_loss_scale_value = loss_scaler_disc.state_dict()["scale"]

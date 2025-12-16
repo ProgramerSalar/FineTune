@@ -194,21 +194,21 @@ class CausalVideoVAE(ModelMixin, ConfigMixin):
 
         
 
-        if freeze_encoder:
-            with torch.no_grad():
-                h = self.encoder(x, is_init_image=True, temporal_chunk=False)
-                moments = self.quant_conv(h, is_init_image=True, temporal_chunk=False)
-                posterior = DiagonalGaussianDistribution(moments)
-                
         
+        with torch.no_grad():
+            h = self.encoder(x, is_init_image=True, temporal_chunk=False)
+            moments = self.quant_conv(h, is_init_image=True, temporal_chunk=False)
+            posterior = DiagonalGaussianDistribution(moments)
             
-            if sample_posterior:
-                z = posterior.sample(generator=generator)
-            else:
-                z = posterior.mode()
+    
+        
+        if sample_posterior:
+            z = posterior.sample(generator=generator)
+        else:
+            z = posterior.mode()
 
-            
-            dec = self.decode(z, is_init_image=True).sample
+        
+        dec = self.decode(z, is_init_image=True).sample
             
         return posterior, dec
     
