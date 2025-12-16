@@ -16,7 +16,7 @@ from torch.utils.data import Dataset, DataLoader
 
 from dataset import (
     VideoDataset,
-    
+    create_mixed_dataloaders
 )
 
 from trainer_misc import (
@@ -92,8 +92,15 @@ def main(args):
     video_dataset = VideoDataset(args.video_anno)
 
     # print(video_dataset)
-    data_loader_train = DataLoader(video_dataset, 
-                                  batch_size=args.batch_size)
+    # data_loader_train = DataLoader(video_dataset, 
+    #                               batch_size=args.batch_size)
+
+    data_loader_train = create_mixed_dataloaders(
+        video_dataset,
+        batch_size=args.batch_size, 
+        num_workers=args.num_workers,
+        epoch=args.seed
+    )
     
     
 
@@ -108,7 +115,7 @@ def main(args):
     print(f'total number of learnable params: {n_learnable_parameters / 1e6} M')
     print(f'total number of fixed params in : {n_fix_parameters / 1e6} M')
 
-    total_batch_size = args.batch_size * utils.get_world_size()
+    total_batch_size = args.batch_size
     print("LR = %.8f" % args.lr)
     print("Min LR = %.8f" % args.min_lr)
     print("Weigth Decay = %.8f" % args.weight_decay)
@@ -122,9 +129,8 @@ def main(args):
     loss_scaler = NativeScalerWithGradNormCount(enabled=True if args.model_dtype == "fp16" else False)
     loss_scaler_disc = NativeScalerWithGradNormCount(enabled=True if args.model_dtype == "fp16" else False) if args.add_discriminator else None
 
-    if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu], find_unused_parameters=False)
-        model_without_ddp = model.module
+    
+    model_without_ddp = model
 
     print("Use step level LR & WD scheduler!")
 

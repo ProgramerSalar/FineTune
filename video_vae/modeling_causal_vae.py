@@ -169,7 +169,8 @@ class CausalVideoVAE(ModelMixin, ConfigMixin):
         if isinstance(module, (self.encoder, self.decoder)):
             module.gradient_checkpointing = value
 
-    
+    def get_last_layer(self):
+        return self.decoder.conv_out.conv.weight
 
 
     def forward(
@@ -198,7 +199,7 @@ class CausalVideoVAE(ModelMixin, ConfigMixin):
                 h = self.encoder(x, is_init_image=True, temporal_chunk=False)
                 moments = self.quant_conv(h, is_init_image=True, temporal_chunk=False)
                 posterior = DiagonalGaussianDistribution(moments)
-                global_posterior = posterior
+                
         
             
             if sample_posterior:
@@ -206,7 +207,23 @@ class CausalVideoVAE(ModelMixin, ConfigMixin):
             else:
                 z = posterior.mode()
 
+            
             dec = self.decode(z, is_init_image=True).sample
             
-            return global_posterior, dec
+        return posterior, dec
+    
+
+    def decode(self, z: torch.FloatTensor, is_init_image=True, temporal_chunk=False, 
+            return_dict: bool = True, window_size: int = 2, tile_sample_min_size: int = 256,) -> Union[DecoderOutput, torch.FloatTensor]:
+        
+        z = self.post_quant_conv(z, is_init_image=is_init_image, temporal_chunk=False)
+        dec = self.decoder(z, is_init_image=is_init_image, temporal_chunk=False)
+
+        if not return_dict:
+            return (dec,)
+
+        return DecoderOutput(sample=dec)
+        
+
+
 
