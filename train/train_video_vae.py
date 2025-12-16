@@ -185,7 +185,7 @@ def main(args):
         log_stats = {**{f'train_{k}': v for k, v in train_stats.items()},
                     'epoch': epoch, 'n_parameters': n_learnable_parameters}
 
-        if args.output_dir and utils.is_main_process():
+        if args.output_dir:
             if log_writer is not None:
                 log_writer.flush()
             with open(os.path.join(args.output_dir, "log.txt"), mode="a", encoding="utf-8") as f:
