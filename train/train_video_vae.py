@@ -25,7 +25,6 @@ from trainer_misc import (
     train_one_epoch,
     auto_load_model,
     save_model,
-    init_distributed_mode,
     cosine_scheduler,
 )
 
@@ -90,7 +89,7 @@ def main(args):
 
 
 
-    video_dataset = VideoDataset(args.anno_file)
+    video_dataset = VideoDataset(args.video_anno)
 
     # print(video_dataset)
     data_loader_train = DataLoader(video_dataset, 
