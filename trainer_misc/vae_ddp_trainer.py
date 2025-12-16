@@ -72,7 +72,7 @@ def train_one_epoch(
     
         samples['video'] = samples['video'].to(device, non_blocking=True)
 
-        with torch.cuda.amp.autocast(enabled=True, dtype=_dtype):
+        with torch.amp.autocast(device_type="cuda", enabled=True, dtype=_dtype):
             rec_loss, gan_loss, log_loss = model(samples['video'], args.global_step, identifier=samples['identifier'])
 
         ###################################################################################################
@@ -130,7 +130,7 @@ def train_one_epoch(
             metric_logger.update(disc_lr=max_lr)
             metric_logger.update(disc_min_lr=min_lr)
 
-        torch.cuda.synchronize()
+        
         new_log_loss = {k.split('/')[-1]:v for k, v in log_loss.items() if k not in ['total_loss']}
         metric_logger.update(**new_log_loss)
 
@@ -165,7 +165,6 @@ def train_one_epoch(
         args.global_step = args.global_step + 1
 
     # gather the stats from all processes
-    metric_logger.synchronize_between_processes()
     print("Averaged stats:", metric_logger)
     
     return {k: meter.global_avg for k, meter in metric_logger.meters.items()}

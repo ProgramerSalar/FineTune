@@ -4,107 +4,34 @@ import math
 import time
 import json
 import glob
-from collections import defaultdict, deque, OrderedDict
+from collections import defaultdict, deque
 import datetime
 import numpy as np
 
 
 from pathlib import Path
-import argparse
+
 
 import torch
 from torch import optim as optim
 import torch.distributed as dist
 
-try:
-    from torch._six import inf
-except ImportError:
-    from torch import inf
-
-from tensorboardX import SummaryWriter
+from torch import inf
 
 
-def is_dist_avail_and_initialized():
-    if not dist.is_available():
-        return False
-    if not dist.is_initialized():
-        return False
-    return True
 
 
-def get_world_size():
-    if not is_dist_avail_and_initialized():
-        return 1
-    return dist.get_world_size()
 
-
-def get_rank():
-    if not is_dist_avail_and_initialized():
-        return 0
-    return dist.get_rank()
-
-
-def is_main_process():
-    return get_rank() == 0
 
 
 def save_on_master(*args, **kwargs):
-    if is_main_process():
-        torch.save(*args, **kwargs)
+    
+    torch.save(*args, **kwargs)
 
 
-def setup_for_distributed(is_master):
-    """
-    This function disables printing when not in master process
-    """
-    import builtins as __builtin__
-    builtin_print = __builtin__.print
-
-    def print(*args, **kwargs):
-        force = kwargs.pop('force', False)
-        if is_master or force:
-            builtin_print(*args, **kwargs)
-
-    __builtin__.print = print
 
 
-def init_distributed_mode(args, init_pytorch_ddp=True):
-    if int(os.getenv('OMPI_COMM_WORLD_SIZE', '0')) > 0:
-        rank = int(os.environ['OMPI_COMM_WORLD_RANK'])
-        local_rank = int(os.environ['OMPI_COMM_WORLD_LOCAL_RANK'])
-        world_size = int(os.environ['OMPI_COMM_WORLD_SIZE'])
 
-        os.environ["LOCAL_RANK"] = os.environ['OMPI_COMM_WORLD_LOCAL_RANK']
-        os.environ["RANK"] = os.environ['OMPI_COMM_WORLD_RANK']
-        os.environ["WORLD_SIZE"] = os.environ['OMPI_COMM_WORLD_SIZE']
-
-        args.rank = int(os.environ["RANK"])
-        args.world_size = int(os.environ["WORLD_SIZE"])
-        args.gpu = int(os.environ["LOCAL_RANK"])
-
-    elif 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
-        args.rank = int(os.environ["RANK"])
-        args.world_size = int(os.environ['WORLD_SIZE'])
-        args.gpu = int(os.environ['LOCAL_RANK'])
-
-    else:
-        print('Not using distributed mode')
-        args.distributed = False
-        return
-
-    args.distributed = True
-    args.dist_backend = 'nccl'
-    args.dist_url = "env://"
-    print('| distributed init (rank {}): {}, gpu {}'.format(
-        args.rank, args.dist_url, args.gpu), flush=True)
-
-    if init_pytorch_ddp:
-        # Init DDP Group, for script without using accelerate framework
-        torch.cuda.set_device(args.gpu)
-        torch.distributed.init_process_group(backend=args.dist_backend, init_method=args.dist_url,
-                world_size=args.world_size, rank=args.rank, timeout=datetime.timedelta(days=365))
-        torch.distributed.barrier()
-        setup_for_distributed(args.rank == 0)
 
 
 def cosine_scheduler(base_value, final_value, epochs, niter_per_ep, warmup_epochs=0, 
@@ -217,8 +144,7 @@ def create_optimizer(args, model, get_num_layer=None, get_layer_scale=None, filt
     parameters = get_parameter_groups(model, weight_decay, args.lr, skip, get_num_layer, get_layer_scale, **kwargs)
     weight_decay = 0.
 
-    if 'fused' in opt_lower:
-        assert has_apex and torch.cuda.is_available(), 'APEX and CUDA required for fused optimizers'
+    
 
     opt_args = dict(lr=args.lr, weight_decay=weight_decay)
     if hasattr(args, 'opt_eps') and args.opt_eps is not None:
@@ -268,18 +194,7 @@ class SmoothedValue(object):
         self.count += n
         self.total += value * n
 
-    def synchronize_between_processes(self):
-        """
-        Warning: does not synchronize the deque!
-        """
-        if not is_dist_avail_and_initialized():
-            return
-        t = torch.tensor([self.count, self.total], dtype=torch.float64, device='cuda')
-        dist.barrier()
-        dist.all_reduce(t)
-        t = t.tolist()
-        self.count = int(t[0])
-        self.total = t[1]
+    
 
     @property
     def median(self):
@@ -342,9 +257,7 @@ class MetricLogger(object):
             )
         return self.delimiter.join(loss_str)
 
-    def synchronize_between_processes(self):
-        for meter in self.meters.values():
-            meter.synchronize_between_processes()
+   
 
     def add_meter(self, name, meter):
         self.meters[name] = meter
