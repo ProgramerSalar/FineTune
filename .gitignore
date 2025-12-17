@@ -117,5 +117,6 @@ venv.bak/
 dmypy.json
 .bak
 
+Data/
 
 

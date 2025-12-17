@@ -11,7 +11,7 @@ LPIPS_CKPT=PATH/vgg_lpips.pth    # The LPIPS VGG CKPT path, used for calculating
 # OUTPUT_DIR=/PATH/output_dir    # The checkpoint saving dir
 OUTPUT_DIR=/content/drive/MyDrive/output_dir    # The checkpoint saving dir
 
-VIDEO_ANNO=annotation/new_file.jsonl   # The video annotation file path
+VIDEO_ANNO=annotation/video_data_files_path.jsonl   # The video annotation file path
 RESOLUTION=256     # The training resolution, default is 256
 NUM_FRAMES=17     # x * 8 + 1, the number of video frames
 BATCH_SIZE=2

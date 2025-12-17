@@ -38,26 +38,23 @@ def convert_into_json(video_folder_path, video_json_file):
 
 if __name__ == "__main__":
 
+    # <------------------------ video data to json format -----------------------------> 
     # video_folder_path = "./Data"
-    # video_json_file = "./annotation/video_dataset.jsonl"
+    video_json_file = "./annotation/video_dataset.json"
     # convert_into_json(video_folder_path, video_json_file)
     # ----------------------------------------------------------------------------------------
-    # Testing video json 
+    # <------------------------- Testing video json --------------------------->
     # video_folder_path = "../Data"
     # video_json_file = "./annotation/sample_video_dataset.jsonl"
     # convert_into_json(video_folder_path, video_json_file)
     # ------------------------------------------------------------------------------
-    # with open(video_json_file, 'r') as f:
-    #     datas = json.load(f)
-    #     for data in datas:
-    #         print(data['video'])
+    # <--------------------- json to jsonl ---------------------------->
+    
 
-    # --------------------------------------------------------------------------------------
-    import json
-
-    # 1. Setup paths
-    input_path = "/home/manish/Desktop/projects/FineTune/annotation/annotation_with_text/video_text_json.json" # Replace this
-    output_path = "annotation/annotation_with_text/video_text.jsonl"    # This will be the fixed file
+    # # 1. Setup paths
+    input_path = video_json_file
+    # input_path = "/home/manish/Desktop/projects/FineTune/annotation/annotation_with_text/video_text_json.json" # Replace this
+    output_path = "annotation//video_data_files_path.jsonl"    # This will be the fixed file
 
     print(f"Reading {input_path}...")
 
