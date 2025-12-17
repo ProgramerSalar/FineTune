@@ -18,24 +18,23 @@
     pip install -r req.txt 
     ```
 
-
-
-4. run the `script`
-    ```
-    sh scripts/train_causal_video_vae.sh
-    ```
-
-
-5. make sure mount the drive file to `colab Notebook`
+4. make sure mount the drive file to `colab Notebook`
 ```
     from google.colab import drive
     drive.mount('/content/drive')
 ```
 
-6. Download the Dataset file 
+5. Download the Dataset file 
 
 ```
     cd FineTune/Data
     hf download ProgramerSalar/clip_video clip_video_part_2.zip --repo-type dataset --local-dir .
     unzip clip_video_part_2.zip
+    rm -rf clip_video_part_2.zip
 ```
+
+
+6. run the `script`
+    ```
+    sh scripts/train_causal_video_vae.sh
+    ```
