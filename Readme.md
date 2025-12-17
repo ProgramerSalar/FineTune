@@ -26,5 +26,15 @@
     ```
 
 
+5. make sure mount the drive file 
+```
+    from google.colab import drive
+    drive.mount('/content/drive')
+```
 
-https://colab.research.google.com/drive/17S11wwvQwkpo3mPIUsQcoX00ydvzs_I6#scrollTo=EJprBrIUc5bX
+6. Download the Dataset file 
+
+```
+    hf download ProgramerSalar/clip_video clip_video_part_2.zip --repo-type dataset --local-dir .
+    unzip clip_video_part_2.zip
+```

@@ -8,7 +8,8 @@
 GPUS=1  # The gpu number
 VAE_MODEL_PATH=PATH/vae_ckpt   # The vae model dir
 LPIPS_CKPT=PATH/vgg_lpips.pth    # The LPIPS VGG CKPT path, used for calculating the lpips loss
-OUTPUT_DIR=/PATH/output_dir    # The checkpoint saving dir
+# OUTPUT_DIR=/PATH/output_dir    # The checkpoint saving dir
+OUTPUT_DIR=/content/drive/MyDrive/output_dir    # The checkpoint saving dir
 
 VIDEO_ANNO=annotation/new_file.jsonl   # The video annotation file path
 RESOLUTION=256     # The training resolution, default is 256
