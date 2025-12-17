@@ -195,10 +195,10 @@ class CausalVideoVAE(ModelMixin, ConfigMixin):
         
 
         
-        with torch.no_grad():
-            h = self.encoder(x, is_init_image=True, temporal_chunk=False)
-            moments = self.quant_conv(h, is_init_image=True, temporal_chunk=False)
-            posterior = DiagonalGaussianDistribution(moments)
+        # with torch.no_grad():
+        h = self.encoder(x, is_init_image=True, temporal_chunk=False)
+        moments = self.quant_conv(h, is_init_image=True, temporal_chunk=False)
+        posterior = DiagonalGaussianDistribution(moments)
             
     
         
